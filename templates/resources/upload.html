@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Upload Resource - StudyShare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title mb-4"><i class="bi bi-cloud-upload"></i> Upload Study Resource</h2>
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title *</label>
+                        <input type="text" class="form-control" id="title" name="title" required placeholder="e.g. Calculus Chapter 5 Notes">
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject *</label>
+                        <select class="form-select" id="subject" name="subject" required>
+                            <option value="">Select a subject</option>
+                            {% for subj in subjects %}
+                            <option value="{{ subj }}">{{ subj }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                                  placeholder="Brief description of the resource..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Resource Type *</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="resource_type" id="type_pdf" value="pdf" checked>
+                            <label class="btn btn-outline-danger" for="type_pdf"><i class="bi bi-file-pdf"></i> PDF</label>
+                            <input type="radio" class="btn-check" name="resource_type" id="type_note" value="note">
+                            <label class="btn btn-outline-primary" for="type_note"><i class="bi bi-file-text"></i> Note</label>
+                            <input type="radio" class="btn-check" name="resource_type" id="type_link" value="link">
+                            <label class="btn btn-outline-info" for="type_link"><i class="bi bi-link"></i> Link</label>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="fileSection">
+                        <label for="file" class="form-label">File *</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".pdf,.txt,.doc,.docx">
+                        <div class="form-text">Accepted: PDF, TXT, DOC, DOCX (max 16 MB)</div>
+                    </div>
+                    <div class="mb-3 d-none" id="urlSection">
+                        <label for="url" class="form-label">URL *</label>
+                        <input type="url" class="form-control" id="url" name="url" placeholder="https://example.com/resource">
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-upload"></i> Upload Resource
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('input[name="resource_type"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const isLink = this.value === 'link';
+        document.getElementById('fileSection').classList.toggle('d-none', isLink);
+        document.getElementById('urlSection').classList.toggle('d-none', !isLink);
+        document.getElementById('file').required = !isLink;
+        document.getElementById('url').required = isLink;
+    });
+});
+</script>
+{% endblock %}

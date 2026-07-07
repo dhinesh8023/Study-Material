@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Resources - StudyShare{% endblock %}
+
+{% block content %}
+
+<div class="hero-banner rounded-3 p-4 mb-4 text-white animate-fade-in">
+    <div class="hero-content">
+        <h1 class="display-6 fw-bold">Study Resource Library</h1>
+        <p class="lead mb-0">
+            Find notes, PDFs, and useful links shared by students.
+        </p>
+    </div>
+
+    <div class="hero-icons" aria-hidden="true">
+        <i class="bi bi-journal-text"></i>
+        <i class="bi bi-file-earmark-pdf"></i>
+        <i class="bi bi-lightbulb"></i>
+    </div>
+</div>
+
+<form method="GET"
+      action="{{ url_for('resources.browse') }}"
+      class="row g-3 mb-4 glass-panel p-3 rounded-3 animate-fade-in animate-delay-1">
+
+    <div class="col-md-5">
+        <input
+            type="text"
+            class="form-control"
+            name="q"
+            placeholder="Search by keyword..."
+            value="{{ search_query }}">
+    </div>
+
+    <div class="col-md-4">
+        <select class="form-select" name="subject">
+            <option value="">All Subjects</option>
+
+            {% for subj in subjects %}
+            <option value="{{ subj }}"
+                {% if subj == selected_subject %}selected{% endif %}>
+                {{ subj }}
+            </option>
+            {% endfor %}
+
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <button class="btn btn-primary w-100" type="submit">
+            <i class="bi bi-search"></i>
+            Search
+        </button>
+    </div>
+
+</form>
+
+{% if current_user.is_authenticated %}
+<div class="text-end mb-4">
+    <a href="{{ url_for('resources.upload') }}"
+       class="btn btn-success">
+        <i class="bi bi-cloud-upload"></i>
+        Upload Resource
+    </a>
+</div>
+{% endif %}
+
+{% if resources %}
+
+<div class="row g-4">
+
+{% for resource in resources %}
+
+<div class="col-md-6 col-lg-4 animate-fade-in" style="animation-delay: {{ loop.index0 * 0.08 }}s">
+
+    <div class="card resource-card shadow-sm h-100">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-start mb-3">
+
+                {% if resource.resource_type == 'link' %}
+                    <i class="bi bi-link-45deg text-info fs-4"></i>
+
+                {% elif resource.resource_type == 'pdf' %}
+                    <i class="bi bi-file-earmark-pdf text-danger fs-4"></i>
+
+                {% else %}
+                    <i class="bi bi-file-earmark-text text-primary fs-4"></i>
+                {% endif %}
+
+                <span class="badge bg-light text-dark border">
+                    {{ resource.subject }}
+                </span>
+
+            </div>
+
+            <h5 class="card-title">
+                {{ resource.title }}
+            </h5>
+
+            {% if resource.description %}
+            <p class="card-text text-muted small">
+                {{ resource.description[:120] }}
+                {% if resource.description|length > 120 %}
+                ...
+                {% endif %}
+            </p>
+            {% endif %}
+
+            <p class="card-text">
+                <small class="text-muted">
+                    Uploaded by
+                    <strong>{{ resource.uploader.username }}</strong>
+                    &middot;
+                    {{ resource.created_at.strftime('%b %d, %Y') }}
+                </small>
+            </p>
+
+        </div>
+
+        <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between">
+
+            <a href="{{ url_for('resources.detail',
+                    resource_id=resource.id) }}"
+               class="btn btn-outline-primary btn-sm">
+                View Details
+            </a>
+
+            <a href="{{ url_for('resources.download',
+                    resource_id=resource.id) }}"
+               class="btn btn-primary btn-sm">
+
+                {% if resource.resource_type == 'link' %}
+                    Open Link
+                {% else %}
+                    Download
+                {% endif %}
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="text-center py-5">
+
+    <i class="bi bi-inbox display-1 text-muted"></i>
+
+    <h4 class="mt-3 text-muted">
+        No resources found
+    </h4>
+
+    <p class="text-muted">
+        Try adjusting your search or be the first to upload!
+    </p>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

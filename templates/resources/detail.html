@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ resource.title }} - StudyShare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        {% if resource.resource_type == 'link' %}
+                        <span class="badge bg-info mb-2">Link</span>
+                        {% elif resource.resource_type == 'pdf' %}
+                        <span class="badge bg-danger mb-2">PDF</span>
+                        {% else %}
+                        <span class="badge bg-primary mb-2">Note</span>
+                        {% endif %}
+                        <h2>{{ resource.title }}</h2>
+                    </div>
+                    <span class="badge bg-light text-dark border fs-6">{{ resource.subject }}</span>
+                </div>
+
+                {% if resource.description %}
+                <p class="lead">{{ resource.description }}</p>
+                {% endif %}
+
+                <hr>
+                <dl class="row">
+                    <dt class="col-sm-3">Uploaded by</dt>
+                    <dd class="col-sm-9">{{ resource.uploader.username }}</dd>
+                    <dt class="col-sm-3">Date</dt>
+                    <dd class="col-sm-9">{{ resource.created_at.strftime('%B %d, %Y at %I:%M %p') }}</dd>
+                    <dt class="col-sm-3">Type</dt>
+                    <dd class="col-sm-9 text-capitalize">{{ resource.resource_type }}</dd>
+                    {% if resource.is_link %}
+                    <dt class="col-sm-3">URL</dt>
+                    <dd class="col-sm-9"><a href="{{ resource.url }}" target="_blank" rel="noopener">{{ resource.url }}</a></dd>
+                    {% endif %}
+                </dl>
+
+                <div class="d-flex gap-2 mt-4">
+                    <a href="{{ url_for('resources.download', resource_id=resource.id) }}" class="btn btn-primary btn-lg">
+                        {% if resource.is_link %}
+                        <i class="bi bi-box-arrow-up-right"></i> Open Link
+                        {% else %}
+                        <i class="bi bi-download"></i> Download
+                        {% endif %}
+                    </a>
+                    <a href="{{ url_for('resources.browse') }}" class="btn btn-outline-secondary btn-lg">Back to Browse</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
